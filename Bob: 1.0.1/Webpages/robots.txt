@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /login.php
+Disallow: /dev_shell.php
+Disallow: /lat_memo.html
+Disallow: /passwords.html
