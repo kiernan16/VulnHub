@@ -1,0 +1,59 @@
+
+Starting Nmap 7.60 ( https://nmap.org ) at 2018-05-20 14:20 EDT
+Nmap scan report for Dimitri (192.168.83.108)
+Host is up (0.018s latency).
+
+PORT    STATE SERVICE  VERSION
+21/tcp  open  ftp      vsftpd 3.0.2
+22/tcp  open  ssh      OpenSSH 6.6.1p1 Ubuntu 2ubuntu2.7 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   1024 a9:98:84:aa:90:7e:f1:e6:be:c0:84:3e:fa:aa:83:8a (DSA)
+|   2048 07:5c:77:15:30:5a:17:95:8e:0f:91:f0:2d:0b:c3:7a (RSA)
+|   256 2f:9c:29:b5:f5:dc:f4:95:07:6d:41:ee:f9:0d:15:b8 (ECDSA)
+|_  256 24:ac:30:c7:79:7f:43:cc:fc:23:df:ea:db:bb:4a:cc (EdDSA)
+80/tcp  open  http     Apache httpd 2.4.7 ((Ubuntu))
+| http-cookie-flags: 
+|   /: 
+|     PHPSESSID: 
+|_      httponly flag not set
+|_http-server-header: Apache/2.4.7 (Ubuntu)
+|_http-title: BlackMarket Weapon Management System
+110/tcp open  pop3     Dovecot pop3d
+|_pop3-capabilities: STLS AUTH-RESP-CODE PIPELINING SASL RESP-CODES UIDL CAPA TOP
+| ssl-cert: Subject: commonName=localhost/organizationName=Dovecot mail server
+| Not valid before: 2017-11-01T07:05:35
+|_Not valid after:  2027-11-01T07:05:35
+|_ssl-date: TLS randomness does not represent time
+143/tcp open  imap     Dovecot imapd (Ubuntu)
+|_imap-capabilities: OK IMAP4rev1 more listed IDLE LOGINDISABLEDA0001 have capabilities STARTTLS Pre-login post-login LOGIN-REFERRALS LITERAL+ SASL-IR ENABLE ID
+| ssl-cert: Subject: commonName=localhost/organizationName=Dovecot mail server
+| Not valid before: 2017-11-01T07:05:35
+|_Not valid after:  2027-11-01T07:05:35
+|_ssl-date: TLS randomness does not represent time
+993/tcp open  ssl/imap Dovecot imapd (Ubuntu)
+|_imap-capabilities: OK IMAP4rev1 AUTH=PLAINA0001 IDLE more have Pre-login listed capabilities post-login ENABLE LITERAL+ SASL-IR LOGIN-REFERRALS ID
+| ssl-cert: Subject: commonName=localhost/organizationName=Dovecot mail server
+| Not valid before: 2017-11-01T07:05:35
+|_Not valid after:  2027-11-01T07:05:35
+|_ssl-date: TLS randomness does not represent time
+995/tcp open  ssl/pop3 Dovecot pop3d
+|_pop3-capabilities: SASL(PLAIN) AUTH-RESP-CODE PIPELINING USER RESP-CODES UIDL CAPA TOP
+| ssl-cert: Subject: commonName=localhost/organizationName=Dovecot mail server
+| Not valid before: 2017-11-01T07:05:35
+|_Not valid after:  2027-11-01T07:05:35
+|_ssl-date: TLS randomness does not represent time
+MAC Address: E0:F8:47:04:4E:38 (Apple)
+Warning: OSScan results may be unreliable because we could not find at least 1 open and 1 closed port
+Device type: general purpose
+Running: Linux 3.X|4.X
+OS CPE: cpe:/o:linux:linux_kernel:3 cpe:/o:linux:linux_kernel:4
+OS details: Linux 3.10 - 4.8, Linux 3.16 - 4.6, Linux 3.2 - 4.8, Linux 4.4
+Network Distance: 1 hop
+Service Info: OSs: Unix, Linux; CPE: cpe:/o:linux:linux_kernel
+
+TRACEROUTE
+HOP RTT      ADDRESS
+1   18.27 ms Dimitri (192.168.83.108)
+
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 19.10 seconds

