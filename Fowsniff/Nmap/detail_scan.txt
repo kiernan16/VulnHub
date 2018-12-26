@@ -1,0 +1,34 @@
+Starting Nmap 7.70 ( https://nmap.org ) at 2018-12-26 15:53 EST
+Nmap scan report for fowsniff (192.168.83.137)
+Host is up (0.042s latency).
+
+PORT    STATE SERVICE VERSION
+22/tcp  open  ssh     OpenSSH 7.2p2 Ubuntu 4ubuntu2.4 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   2048 90:35:66:f4:c6:d2:95:12:1b:e8:cd:de:aa:4e:03:23 (RSA)
+|   256 53:9d:23:67:34:cf:0a:d5:5a:9a:11:74:bd:fd:de:71 (ECDSA)
+|_  256 a2:8f:db:ae:9e:3d:c9:e6:a9:ca:03:b1:d7:1b:66:83 (ED25519)
+80/tcp  open  http    Apache httpd 2.4.18 ((Ubuntu))
+| http-robots.txt: 1 disallowed entry 
+|_/
+|_http-server-header: Apache/2.4.18 (Ubuntu)
+|_http-title: Fowsniff Corp - Delivering Solutions
+110/tcp open  pop3    Dovecot pop3d
+|_pop3-capabilities: USER SASL(PLAIN) CAPA TOP PIPELINING UIDL RESP-CODES AUTH-RESP-CODE
+143/tcp open  imap    Dovecot imapd
+|_imap-capabilities: more have post-login SASL-IR IDLE ID AUTH=PLAINA0001 capabilities Pre-login IMAP4rev1 LOGIN-REFERRALS OK listed ENABLE LITERAL+
+MAC Address: E0:F8:47:04:4E:38 (Apple)
+Warning: OSScan results may be unreliable because we could not find at least 1 open and 1 closed port
+Device type: general purpose
+Running: Linux 3.X|4.X
+OS CPE: cpe:/o:linux:linux_kernel:3 cpe:/o:linux:linux_kernel:4
+OS details: Linux 3.2 - 4.9
+Network Distance: 1 hop
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+TRACEROUTE
+HOP RTT      ADDRESS
+1   42.10 ms fowsniff (192.168.83.137)
+
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 11.38 seconds

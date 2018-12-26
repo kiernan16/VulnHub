@@ -1,0 +1,42 @@
+Located in respective folders:
+
+Baksteen
+# cat term.txt
+I wonder if the person who coined the term "One Hit Wonder" 
+came up with another other phrases.
+
+Mauer
+# cat pajamas.txt
+One morning, I shopt an elephant in my pajamas.
+How he got into my pajamas I'll never know.
+
+Mursten
+# cat percent.txt
+Accordion to a survey, 73 percent of people miss
+the word 'accordion' at the beginning of this sentence.
+
+Mustikka
+# cat attack.txt
+I was attacked by a group of mimes who did unspeakable things!
+
+Parede
+# cat friend.txt
+Outside of a dog, a book is man's best friend. Inside of a dog, it's too dark to read.
+
+Sciana
+# cat live.txt
+I intend to live forever, or die trying.
+
+Seina
+# cat doubt.txt
+Without a doubt, my favorite Robin Williams movie is Ms. Fire.
+
+Stone
+# cat early.txt
+I must confess I was born at a very early age.
+
+Tegel
+# cat five.txt
+A child of five would understand this! 
+Send someone to fetch a child of five.
+

