@@ -50,6 +50,8 @@ seems to be nothing in his folder - can't access others
 baksteen@fowsniff:~$ id
 uid=1004(baksteen) gid=100(users) groups=100(users),1001(baksteen)
 
+baksteen@fowsniff:~$ find / -group users -type f 2>/dev/null
+
 ability to run /opt/cube/cube.sh (message/design for startup banner on ssh)
 -rw-rwxr-- 1 parede users 851 Mar 11  2018 cube.sh
 
