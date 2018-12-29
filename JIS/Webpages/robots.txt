@@ -1,0 +1,9 @@
+User-agent: *
+Disallow: /
+Disallow: /backup
+Disallow: /admin
+Disallow: /admin_area
+Disallow: /r00t
+Disallow: /uploads
+Disallow: /uploaded_files
+Disallow: /flag
